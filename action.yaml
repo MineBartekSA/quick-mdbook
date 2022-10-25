@@ -1,0 +1,40 @@
+name: Quick mdBook Installer
+description: A installer for mdBook written using only bash
+author: MineBartekSA
+
+branding:
+  icon: book-open
+  color: purple
+
+inputs:
+  version:
+    description: The mdBook version to download
+    required: false
+    default: latest
+
+runs:
+  using: composite
+  steps:
+    - name: Install
+      shell: bash
+      env:
+        OS: ${{ runner.os }}
+        VERSION: ${{ inputs.version }}
+      run: |
+        if [ "$VERSION" != "latest" ]
+        then
+          [[ "$VERSION" != v* ]] && VERSION="v$VERSION"
+          VERSION="tags/$VERSION"
+        fi
+        TMP=$(mktemp -d)
+        [ "$OS" == "macOS" ] && platform="apple" || platform=$(echo "$OS" | awk '{print tolower($0)}')
+        URL=$(curl -sSL https://api.github.com/repos/rust-lang/mdbook/releases/$VERSION | jq -r ".assets[] | select(.name | contains(\"$platform\")) | .browser_download_url")
+        curl -sSL $URL >> $TMP/bundle.zip
+        if [ "$OS" == "Windows" ]
+        then
+          cd $TMP
+          powershell -command 'Expand-Archive -Force bundle.zip -DestinationPath .; Get-Location >> $env:GITHUB_PATH'
+        else
+          tar xzf $TMP/bundle.zip -C $TMP
+          echo $TMP >> $GITHUB_PATH
+        fi

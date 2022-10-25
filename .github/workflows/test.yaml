@@ -1,0 +1,41 @@
+name: Test quick-mdbook
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test if it works on Linux
+        uses: MineBartekSA/quick-mdbook@main
+      - name: Check
+        run: mdbook --version
+  
+  linux-pinned-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install mdBook v0.4.20
+        uses: MineBartekSA/quick-mdbook@main
+        with:
+          version: 0.4.20
+      - name: Check
+        run: mdbook --version
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Test if it works on Windows
+        uses: MineBartekSA/quick-mdbook@main
+      - name: Check
+        run: mdbook.exe --version
+
+  mac:
+    runs-on: macos-latest
+    steps:
+      - name: Test if it work on Mac
+        uses: MineBartekSA/quick-mdbook@main
+      - name: Check
+        run: mdbook --version
