@@ -11,6 +11,14 @@ inputs:
     description: The mdBook version to download
     required: false
     default: latest
+  arch:
+    description: The architecture for which to download
+    required: false
+    default: x86_64
+  clib:
+    description: The C Library used to build mdBook
+    required: false
+    default: gnu
 
 runs:
   using: composite
@@ -20,6 +28,8 @@ runs:
       env:
         OS: ${{ runner.os }}
         VERSION: ${{ inputs.version }}
+        ARCH: ${{ inputs.arch }}
+        CLIB: ${{ inputs.clib }}
       run: |
         if [ "$VERSION" != "latest" ]
         then
@@ -28,7 +38,9 @@ runs:
         fi
         TMP=$(mktemp -d)
         [ "$OS" == "macOS" ] && platform="apple" || platform=$(echo "$OS" | awk '{print tolower($0)}')
-        URL=$(curl -sSL https://api.github.com/repos/rust-lang/mdbook/releases/$VERSION | jq -r ".assets[] | select(.name | contains(\"$platform\")) | .browser_download_url")
+        [ "$platform" == "windows" ] && CLIB="msvc"
+        [ "$platform" == "apple" ] && CLIB="darwin"
+        URL=$(curl -sSL https://api.github.com/repos/rust-lang/mdbook/releases/$VERSION | jq -r ".assets[] | select(.name | contains(\"$ARCH\")) | select(.name | contains(\"$platform\")) | select(.name | contains(\"$CLIB\")) | .browser_download_url")
         curl -sSL $URL >> $TMP/bundle.zip
         if [ "$OS" == "Windows" ]
         then
