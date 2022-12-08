@@ -19,3 +19,13 @@ You can also use an optional `version` input to specify the target mdBook versio
   with:
     version: 0.4.21
 ```
+
+You can also use optional `arch` and `clib` inputs to specify the target build architecture and C Library.
+
+```yaml
+- name: Install latest mdBook for the aarch64 architecture build on musl
+  uses: MineBartekSA/quick-mdbook@v1
+  with:
+    arch: aarch64
+    clib: musl
+```
