@@ -40,6 +40,7 @@ runs:
         [ "$OS" == "macOS" ] && platform="apple" || platform=$(echo "$OS" | awk '{print tolower($0)}')
         [ "$platform" == "windows" ] && CLIB="msvc"
         [ "$platform" == "apple" ] && CLIB="darwin"
+        echo "::debug::Version: '$VERSION' Platform: '$platform' Arch: '$ARCH' C Library: '$CLIB'"
         URL=$(curl -sSL https://api.github.com/repos/rust-lang/mdbook/releases/$VERSION | jq -r ".assets[] | select(.name | contains(\"$ARCH\")) | select(.name | contains(\"$platform\")) | select(.name | contains(\"$CLIB\")) | .browser_download_url")
         curl -sSL $URL >> $TMP/bundle.zip
         if [ "$OS" == "Windows" ]
